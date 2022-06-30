@@ -16,8 +16,7 @@
                         lazy-validation
                     >
                         <v-card-text >
-                                        
-                        
+
                             <v-row align="center">
                                 <v-col
                                     class="d-flex"
@@ -101,7 +100,6 @@
                                         outlined
                                         clearable
                                         thai_engLanguage
-                                        maxlength="30"
                                     ></v-text-field>
                                 </v-col>
 
@@ -180,6 +178,7 @@
 </template>
 <script>
     import  axios  from "axios";
+    import Swal from 'sweetalert2'
     export default {
          props: ['item'],
         data: () => ({
@@ -225,29 +224,41 @@
                
             
         }),
-        created(){
-            // console.log(this.$route.query);
-            
-        },
+        created(){},
         methods: {
             async saveUser(){
-                this.$refs.form.validate()
-                let fd = {
-                    "username" : this.username,
-                    "password" : this.password,
-                    "name" : this.name,
-                    "lastname" : this.lastname,
-                    "position" : this.position,
-                    "divisions" : this.divisions,
-                    "detail" : this.detail,
-                    "roles": this.roles
-                }
-                try {
-                    let path = await `/api/createUser`
-                    let res = await axios.post(`${path}`, fd)
-                    console.log(res);
-                } catch (error) {
-                    console.log('error :' + error)
+                if(this.$refs.form.validate()){
+                    let fd = {
+                        "username" : this.username,
+                        "password" : this.password,
+                        "name" : this.name,
+                        "lastname" : this.lastname,
+                        "position" : this.position,
+                        "divisions" : this.divisions,
+                        "detail" : this.detail,
+                        "roles": this.roles
+                    }
+                    try {
+                        let path = await `/api/createUser`
+                        let res = await axios.post(`${path}`, fd)
+                        console.log(res);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกสำเร็จ',
+                            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                        }).then( function(){
+                            window.location.href = '/user';
+                        });
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'บันทึกไม่สำเร็จ',
+                            text: 'มีข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น โปรดลองใหม่อีกครั้ง'
+                        })
+                        console.log('error :' + error)
+                    }
+                } else{
+                    this.$refs.form.validate()
                 }
             },
             cancel(){
